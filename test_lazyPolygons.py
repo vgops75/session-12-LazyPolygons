@@ -1,7 +1,11 @@
 import math
+!pip install -m itertools
 import itertools
 import random
 import pytest
+
+from lazyPolygon import Polygon
+from lazyPolygon import PolygonIterator
 
 # START OF Polygon class TEST CASES
 
