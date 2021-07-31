@@ -3,8 +3,8 @@ import random
 import pytest
 import itertools
 
-from lazyPolygon import Polygon
-from lazyPolygon import PolygonIterator
+from lazyPolygons import Polygon
+from lazyPolygons import PolygonIterator
 
 # START OF Polygon class TEST CASES
 
