@@ -1,6 +1,7 @@
 import math
 import random
 import pytest
+import itertools
 
 from lazyPolygon import Polygon
 from lazyPolygon import PolygonIterator
