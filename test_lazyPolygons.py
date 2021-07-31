@@ -1,6 +1,5 @@
 import math
-python -m pip install itertools
-import itertools
+from itertools import itertools
 import random
 import pytest
 
