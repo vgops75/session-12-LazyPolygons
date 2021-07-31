@@ -1,5 +1,5 @@
 import math
-!pip install -m itertools
+python -m pip install itertools
 import itertools
 import random
 import pytest
