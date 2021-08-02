@@ -1,7 +1,12 @@
 import math
 import itertools
 
+#####################################################################################################
 # Regular Convex Polygon Object
+
+# Two independent attributes -- num_edges and circum_rad, and hence flag is a list of two items
+# (as briefed in the README.md file). Six dependent properties and hence 6 items in the list repeats
+# to track the calling status of these parameters.
 
 class Polygon:
     '''
@@ -60,11 +65,11 @@ class Polygon:
     
     @property
     def vertices(self):
-        print('getter for vertices')
+        # print('getter for vertices')
         cnts = self.__repeats[0]
         if cnts == 0:
             if self._vertices is None or sum(self.__flag) >= 1:
-                print(f'first time executing ...')
+                # print(f'executing first time ...')
                 # return self.get_num_edges
                 self._vertices = self.get_num_edges
                 self.__repeats[0] = 1
@@ -72,55 +77,55 @@ class Polygon:
         
     @property
     def int_angle(self):
-        print('getter for interior angle')
+        # print('getter for interior angle')
         cnts = self.__repeats[1]
         if cnts == 0:
             if self._int_angle is None or sum(self.__flag) >= 1:
-                print(f'executing first time ...')
+                # print(f'executing first time ...')
                 self._int_angle = (self.get_num_edges - 2) * 180 / self.get_num_edges
                 self.__repeats[1] = 1
         return self._int_angle
 
     @property
     def edge_length(self):
-        print('getter for edge_length')
+        # print('getter for edge_length')
         cnts = self.__repeats[2]
         if cnts == 0:
             if self._edge_length is None or sum(self.__flag) >= 1:
-                print(f'executing first time ...')
+                # print(f'executing first time ...')
                 self._edge_length = 2*self.get_circum_rad * math.sin(math.pi / self.get_num_edges)
                 self.__repeats[2] = 1
         return self._edge_length
 
     @property
     def apothem(self):
-        print('getter for apothem')
+        # print('getter for apothem')
         cnts = self.__repeats[3]
         if cnts == 0:
             if self._apothem is None or sum(self.__flag) >= 1:
-                print(f'executing first time ...')
+                # print(f'executing first time ...')
                 self._apothem = self.get_circum_rad * math.cos(math.pi / self.get_num_edges)
                 self.__repeats[3] = 1
         return self._apothem
 
     @property
     def area(self):
-        print('getter for area')
+        # print('getter for area')
         cnts = self.__repeats[4]
         if cnts == 0:
             if self._area is None or sum(self.__flag) >= 1:
-                print(f'executing first time ...')
+                # print(f'executing first time ...')
                 self._area = self.get_num_edges * self.edge_length * self.apothem / 2
                 self.__repeats[4] = 1
         return self._area
 
     @property
     def perimeter(self):
-        print('getter for perimeter')
+        # print('getter for perimeter')
         cnts = self.__repeats[5]
         if cnts == 0:
             if self._perimeter is None or sum(self.__flag) >= 1:
-                print(f'executing first time ...')
+                # print(f'executing first time ...')
                 self._perimeter = self.get_num_edges * self.edge_length
                 self.__repeats[5] = 1
         return self._perimeter
@@ -147,14 +152,18 @@ class Polygon:
             return print(f'Compare instances of same class: Right-side instance not a Polygon')
 
 #####################################################################################################
-            
+#####################################################################################################
+# Class PolygonIterator creates a sequence of polygons of class type Polygon
+# such a way that the argument num_vertices correspond to the number of edges of the largest Polygon
+# in the polygon sequence. First polygon in the sequence starts with num_edges = 3 (minimum number
+# of edges required to construct a polygon).
+
 class PolygonIterator:
     '''
     This class takes in number of vertices for the largest polygon in the sequence. Currently the sequence type is chosen as list,
     but it can be changed later, if required. The SequencePolygon class also takes in a circum_radius and it is assumed to be common
     for all of the polygons in the sequence.
     '''
-    
     def __init__(self, num_vertices=3, circum_rad=6):
         if not isinstance(num_vertices, int):
             raise TypeError(f'"num_vertices" is an integer; TypeError')
@@ -163,7 +172,8 @@ class PolygonIterator:
         
         self.num_vertices = num_vertices
         self.circum_rad = circum_rad
-        self._pgon_pairs = ((Polygon, (edges, self.circum_rad)) for edges in range(3, self.num_vertices+1))
+        # self._pgon_pairs = ((Polygon, (edges, self.circum_rad)) for edges in range(3, self.num_vertices+1))
+        self.pairs = ((edges, self.circum_rad) for edges in range(3, self.num_vertices+1))
         self.__start = 0
         
     def __len__(self):
@@ -173,28 +183,56 @@ class PolygonIterator:
         return f'PolygonIterator(iterable: edges={self.num_vertices}, fixed: rad={self.circum_rad})'
     
     def __iter__(self):
-        return self._pgon_pairs
-               
-    def __next__(self):
-        try:
-            if self.__start < (self.num_vertices - 2):
-                current = self.__start
-                self.__start += 1
-                res = next(self._pgon_pairs)
-                return res[0](*res[1])
-            else:
-                raise StopIteration
-        except StopIteration:
-            print(f'StopIteration: Iterator reached max_value')
+        return self.PgonIter(num_polygons=len(self), polypairs = self.pairs)
+    
+    def start_again(self):
+        self.pairs = ((edges, self.circum_rad) for edges in range(3, self.num_vertices+1))
+        return self.pairs       
                 
     def __getitem__(self, index):
+        self.pairs = self.start_again()
         try:
             if index not in range(self.num_vertices - 2):
                 raise IndexError
         except Exception:
-            print(f'IndexError: Index out of range')     
+            print(f'IndexError: Index out of range')
+            return f''
         else:
-            res = next(itertools.islice(self._pgon_pairs, index, index+1))
-            return res[0](*res[1])
+            keyval_pairs = dict(enumerate(self.pairs))
+            if index >= len(self):
+                raise IndexError
+            vals = keyval_pairs[index]
+            edges = vals[0]
+            circum_radius = vals[1]
+            self.pairs = self.start_again()
+            return Polygon(edges, circum_radius)
             
+    class PgonIter:
+        def __init__(self, num_polygons, polypairs):
+            self.length = num_polygons
+            self.i = 0
+            self.polyps = polypairs
+            
+        def __iter__(self):
+            return self
+        
+        def __next__(self):
+            # print(f'Executing PgonIter __next__')
+            try:
+                if self.i >= self.length:
+                    raise StopIteration
+            except StopIteration:
+                print(f'StopIteration: Iterator reached max_value')
+                return print(f'')
+            else:
+                current = self.i
+                self.i += 1
+                res = next(self.polyps)
+                return Polygon(*res)
+#####################################################################################################
+
+
+
+
+
 

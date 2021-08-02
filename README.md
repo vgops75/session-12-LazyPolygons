@@ -6,8 +6,4 @@ Note: Only independent parameters are defined with setter methods (These are num
 
 Exception: I could have made all the dependent parameters with `__` to stop any accidental or intentional editing of parameters but I go with the python standard notation of single `_`. As a result, changes to dependent parameters is possible and could give 'incorrect' results with no warnings or error messages which is dangerous. One example is shown to illustrate this result in notebook.
 
-Test cases for class Polygon is working.
-
-Test cases for class PolygonIterator is to be resolved for issues related to `__getitem__` not getting the proper item pointing to the index specified due to advancing of item pointer to the next value in the generator i.e., need to include some resetting of generator to get the correct item of specified index value. First time, the index specified value is correct but if we operate the same index on the object, I am getting a different value (or the value corresponding to the next item in the generator).
-
-
+Test cases for class Polygon and class PolygonIterator are included. Test files needed some changes to suit the test conditions.
